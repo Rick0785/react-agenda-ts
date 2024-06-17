@@ -1,5 +1,6 @@
 import { useGetCalendarsQuery } from './api/calendar';
 import { useGetEventsQuery } from './api/event';
+import Calendar from './pages/Calendar';
 
 function App() {
   const { data: calendars } = useGetCalendarsQuery();
@@ -8,7 +9,7 @@ function App() {
   console.log({ calendars });
   console.log({ events });
 
-  return <div>Olá</div>;
+  return <Calendar></Calendar>;
 }
 
 export default App;
