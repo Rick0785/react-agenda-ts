@@ -9,14 +9,23 @@ export interface IEvent {
   calendarId: number;
 }
 
-const eventQueryKey: string = 'events';
+export const eventQueryKey = (from: string, to: string) => [
+  'events',
+  { from: `${from}`, to: `${to}` },
+];
 
-const getEvents = (): Promise<IEvent[]> =>
-  api.get(`/${eventQueryKey}`).then(resp => resp.data);
+export const getEvents = (from: string, to: string): Promise<IEvent[]> =>
+  api
+    .get(`/events?date_gte=${from}&date_lte=${to}&_sort=date,time`)
+    .then(resp => resp.data);
 
-export const useGetEventsQuery = (): UseQueryResult<IEvent[], Error> => {
+export const useGetEventsQuery = (
+  from: string,
+  to: string
+): UseQueryResult<IEvent[], Error> => {
   return useQuery<IEvent[], Error>({
-    queryKey: [eventQueryKey],
-    queryFn: getEvents,
+    queryKey: eventQueryKey(from, to),
+    queryFn: () => getEvents(from, to),
+    enabled: !!from && !!to,
   });
 };

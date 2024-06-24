@@ -5,11 +5,12 @@ export interface ICalendar {
   id: number;
   name: string;
   color: string;
+  selected: boolean;
 }
 
-const calendarsQueryKey: string = 'calendars';
+export const calendarsQueryKey: string = 'calendars';
 
-const getCalendars = (): Promise<ICalendar[]> =>
+export const getCalendars = (): Promise<ICalendar[]> =>
   api.get(`/${calendarsQueryKey}`).then(resp => resp.data);
 
 export const useGetCalendarsQuery = (): UseQueryResult<ICalendar[], Error> => {
