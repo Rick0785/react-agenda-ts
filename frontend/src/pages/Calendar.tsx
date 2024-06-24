@@ -15,11 +15,20 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import PersonIcon from '@mui/icons-material/Person';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import Avatar from '@mui/material/Avatar';
-import { getToday } from '../utils/date';
+import {
+  getFromYearMonthISO,
+  getMonthYearFormatted,
+  getNextDay,
+  getNextMonth,
+  getPrevMonth,
+  getToday,
+  getYearMonthISOFromDate,
+} from '../utils/date';
 import { DateTime } from 'luxon';
 import { getEvents, IEvent } from '../api/event';
 import { getCalendars, ICalendar } from '../api/calendar';
 import React, { useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 
 const DAYS_OF_WEEK = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
 
@@ -61,11 +70,15 @@ const styles = {
 };
 
 const Calendar = () => {
+  const { month } = useParams<{ month: string }>();
+
   const [calendars, setCalendars] = useState<ICalendar[]>([]);
   const [events, setEvents] = useState<IEvent[]>([]);
-  const calendarScreen = generateCalendarScreen(calendars, events);
+  const calendarScreen = generateCalendarScreen(month, calendars, events);
   const firstDate = calendarScreen.firstDate.startOf('day').toISO();
   const lastDate = calendarScreen.lastDate.startOf('day').toISO();
+
+  console.log({ calendarScreen });
 
   React.useEffect(() => {
     if (firstDate && lastDate) {
@@ -125,15 +138,27 @@ const Calendar = () => {
       <Box display={'flex'} flexDirection={'column'} flex={1}>
         <Box display={'flex'} alignItems={'center'} padding="8px 16px">
           <Box>
-            <IconButton aria-label="Mês Anterior">
+            <IconButton
+              aria-label="Mês Anterior"
+              component={Link}
+              to={`/calendar/${getYearMonthISOFromDate(
+                getPrevMonth(calendarScreen.date)
+              )}`}
+            >
               <ChevronLeftIcon />
             </IconButton>
-            <IconButton aria-label="Próximo mês">
+            <IconButton
+              aria-label="Próximo mês"
+              component={Link}
+              to={`/calendar/${getYearMonthISOFromDate(
+                getNextMonth(calendarScreen.date)
+              )}`}
+            >
               <ChevronRightIcon />
             </IconButton>
           </Box>
           <Box component={'h3'} marginLeft={'16px'} flex={1}>
-            Junho de 2024
+            {calendarScreen.monthFormatted}
           </Box>
           <IconButton aria-label="Usuáro">
             <Avatar>
@@ -220,16 +245,21 @@ interface ICalendarScreenWeek {
 }
 
 interface ICalendarScreen {
+  date: DateTime;
+  monthFormatted: string;
   firstDate: DateTime;
   lastDate: DateTime;
   weeks: ICalendarScreenWeek[];
 }
 
 const generateCalendarScreen = (
+  month: string | undefined,
   calendars: ICalendar[] | undefined,
   events: IEvent[] | undefined
 ): ICalendarScreen => {
-  const date = getToday();
+  console.log({ month });
+  const date = month ? getFromYearMonthISO(month) : getToday();
+  console.log({ date });
   const firstDayOfMonth = date.startOf('month');
   const firstDayOfCalendar = firstDayOfMonth.startOf('week', {
     useLocaleWeeks: true,
@@ -239,6 +269,8 @@ const generateCalendarScreen = (
     useLocaleWeeks: true,
   });
   const calendarScreen: ICalendarScreen = {
+    date,
+    monthFormatted: getMonthYearFormatted(date),
     firstDate: firstDayOfCalendar,
     lastDate: lastDayOfCalendar,
     weeks: [],
@@ -265,7 +297,7 @@ const generateCalendarScreen = (
           return { ...event, calendar };
         });
       daysOfWeek.push({ dayOfWeek, date: currentDay, events: dayEvents });
-      currentDay = currentDay.plus({ days: 1 });
+      currentDay = getNextDay(currentDay);
     }
     calendarScreen.weeks.push({
       firstDate: daysOfWeek.at(0)?.date!,
