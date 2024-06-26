@@ -6,8 +6,10 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Box from '@mui/material/Box';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
-import { ICalendarScreen } from './Calendar';
+import { ICalendarTable } from './Calendar';
 import { DAYS_OF_WEEK } from '../utils/date';
+import { DateTime } from 'luxon';
+import { IEvent } from '../api/event';
 
 const styles = {
   table: {
@@ -47,11 +49,24 @@ const styles = {
 };
 
 interface ICalendarScreenProps {
-  calendarScreen: ICalendarScreen;
+  calendarTable: ICalendarTable;
+  onClickDay: (day: DateTime) => void;
+  onClickEvent: (event: IEvent) => void;
 }
 
 const CalendarTable = (props: ICalendarScreenProps) => {
-  const { calendarScreen } = props;
+  const { calendarTable, onClickDay, onClickEvent } = props;
+
+  const handleClickDay = (mouseEvent: React.MouseEvent, day: DateTime) => {
+    if (mouseEvent.target === mouseEvent.currentTarget) {
+      onClickDay(day);
+    }
+  };
+
+  const handleClickEvent = (event: IEvent) => {
+    onClickEvent(event);
+  };
+
   return (
     <TableContainer component={Box} flex={1}>
       <Table sx={styles.table} aria-label="simple table">
@@ -65,11 +80,15 @@ const CalendarTable = (props: ICalendarScreenProps) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {calendarScreen?.weeks.map((week, i) => (
+          {calendarTable?.weeks.map((week, i) => (
             <TableRow key={i}>
               {week?.days.map(day => {
                 return (
-                  <TableCell align="center" key={day.date.toString()}>
+                  <TableCell
+                    align="center"
+                    key={day.date.toString()}
+                    onClick={mouseEvent => handleClickDay(mouseEvent, day.date)}
+                  >
                     <Box sx={styles.dayOfWeek}>{day.date.day}</Box>
                     {day.events?.map(event => {
                       const color = event.calendar?.color;
@@ -78,6 +97,7 @@ const CalendarTable = (props: ICalendarScreenProps) => {
                           key={event.id}
                           component={'button'}
                           sx={styles.event}
+                          onClick={() => handleClickEvent(event)}
                         >
                           {event.time && (
                             <>

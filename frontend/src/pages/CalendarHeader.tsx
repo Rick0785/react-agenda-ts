@@ -10,14 +10,14 @@ import {
   getYearMonthISOFromDate,
 } from '../utils/date';
 import { Link } from 'react-router-dom';
-import { ICalendarScreen } from './Calendar';
+import { ICalendarTable } from './Calendar';
 
 interface ICalendarHeaderProps {
-  calendarScreen: ICalendarScreen;
+  calendarTable: ICalendarTable;
 }
 
 const CalendarHeader = (props: ICalendarHeaderProps) => {
-  const { calendarScreen } = props;
+  const { calendarTable } = props;
   return (
     <Box display={'flex'} alignItems={'center'} padding="8px 16px">
       <Box>
@@ -25,7 +25,7 @@ const CalendarHeader = (props: ICalendarHeaderProps) => {
           aria-label="Mês Anterior"
           component={Link}
           to={`/calendar/${getYearMonthISOFromDate(
-            getPrevMonth(calendarScreen.date)
+            getPrevMonth(calendarTable.date)
           )}`}
         >
           <ChevronLeftIcon />
@@ -34,14 +34,14 @@ const CalendarHeader = (props: ICalendarHeaderProps) => {
           aria-label="Próximo mês"
           component={Link}
           to={`/calendar/${getYearMonthISOFromDate(
-            getNextMonth(calendarScreen.date)
+            getNextMonth(calendarTable.date)
           )}`}
         >
           <ChevronRightIcon />
         </IconButton>
       </Box>
       <Box component={'h3'} marginLeft={'16px'} flex={1}>
-        {calendarScreen.monthFormatted}
+        {calendarTable.monthFormatted}
       </Box>
       <IconButton aria-label="Usuáro">
         <Avatar>

@@ -11,12 +11,15 @@ export const getToday = (): DateTime => {
 };
 
 export const getTodayISO = (): string => {
-  return DateTime.now().toISO();
+  return DateTime.now().toFormat('yyyy-MM-dd');
+};
+
+export const getISOFromDate = (date: DateTime): string => {
+  return date.toFormat('yyyy-MM-dd');
 };
 
 export const getYearMonthISO = (): string => {
-  const now = DateTime.now();
-  return now.toFormat('yyyy-MM');
+  return DateTime.now().toFormat('yyyy-MM');
 };
 
 export const getYearMonthISOFromDate = (date: DateTime): string => {
@@ -27,8 +30,14 @@ export const getFromYearMonthISO = (yearMonthISO: string): DateTime => {
   return DateTime.fromFormat(yearMonthISO, 'yyyy-MM');
 };
 
+const upperFirstLetter = (string: string): string => {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+};
+
 export const getMonthYearFormatted = (date: DateTime): string => {
-  return date.toLocaleString({ month: 'long', year: 'numeric' });
+  return upperFirstLetter(
+    date.toLocaleString({ month: 'long', year: 'numeric' })
+  );
 };
 
 export const getNextMonth = (date: DateTime): DateTime => {

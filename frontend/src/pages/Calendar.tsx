@@ -1,49 +1,49 @@
+import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import {
   DAYS_OF_WEEK,
   getFromYearMonthISO,
+  getISOFromDate,
   getMonthYearFormatted,
   getNextDay,
   getToday,
 } from '../utils/date';
 import { DateTime } from 'luxon';
-import { getEvents, IEvent } from '../api/event';
+import { getEvents, IEdittingEvent, IEvent } from '../api/event';
 import { getCalendars, ICalendar } from '../api/calendar';
-import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import CalendarsView from './CalendarsView';
 import CalendarHeader from './CalendarHeader';
 import CalendarTable from './CalendarTable';
+import EventFormDialog from './EventFormDialog';
 
-interface ICalendarScreenCell {
+export interface ICalendarTableCell {
   dayOfWeek: string;
   date: DateTime;
   events: (IEvent & { calendar: ICalendar | undefined })[] | undefined;
 }
 
-interface ICalendarScreenWeek {
+export interface ICalendarTableWeek {
   firstDate: DateTime;
   lastDate: DateTime;
-  days: ICalendarScreenCell[];
+  days: ICalendarTableCell[];
 }
 
-export interface ICalendarScreen {
+export interface ICalendarTable {
   date: DateTime;
   monthFormatted: string;
   firstDate: DateTime;
   lastDate: DateTime;
-  weeks: ICalendarScreenWeek[];
+  weeks: ICalendarTableWeek[];
 }
 
-const generateCalendarScreen = (
+const generateCalendarTable = (
   month: string | undefined,
   calendars: ICalendar[] | undefined,
   events: IEvent[] | undefined
-): ICalendarScreen => {
-  console.log({ month });
+): ICalendarTable => {
   const date = month ? getFromYearMonthISO(month) : getToday();
-  console.log({ date });
   const firstDayOfMonth = date.startOf('month');
   const firstDayOfCalendar = firstDayOfMonth.startOf('week', {
     useLocaleWeeks: true,
@@ -52,7 +52,7 @@ const generateCalendarScreen = (
   const lastDayOfCalendar = lastDayOfMonth.endOf('week', {
     useLocaleWeeks: true,
   });
-  const calendarScreen: ICalendarScreen = {
+  const calendarScreen: ICalendarTable = {
     date,
     monthFormatted: getMonthYearFormatted(date),
     firstDate: firstDayOfCalendar,
@@ -65,7 +65,7 @@ const generateCalendarScreen = (
 
   let currentDay = firstDayOfCalendar;
   do {
-    const daysOfWeek: ICalendarScreenCell[] = [];
+    const daysOfWeek: ICalendarTableCell[] = [];
     for (const dayOfWeek of DAYS_OF_WEEK) {
       const day = currentDay;
       const dayEvents = events
@@ -96,9 +96,10 @@ const Calendar = () => {
   const { month } = useParams<{ month: string }>();
   const [calendars, setCalendars] = useState<ICalendar[]>([]);
   const [events, setEvents] = useState<IEvent[]>([]);
-  const calendarScreen = generateCalendarScreen(month, calendars, events);
-  const firstDate = calendarScreen.firstDate.startOf('day').toISO();
-  const lastDate = calendarScreen.lastDate.startOf('day').toISO();
+  const [editingEvent, setEditingEvent] = useState<IEdittingEvent | null>(null);
+  const calendarTable = generateCalendarTable(month, calendars, events);
+  const firstDate = calendarTable.firstDate.startOf('day').toISO();
+  const lastDate = calendarTable.lastDate.startOf('day').toISO();
 
   React.useEffect(() => {
     if (firstDate && lastDate) {
@@ -115,6 +116,12 @@ const Calendar = () => {
     }
   }, [firstDate, lastDate]);
 
+  const refreshEvents = () => {
+    if (firstDate && lastDate) {
+      getEvents(firstDate, lastDate).then(setEvents);
+    }
+  };
+
   const toggleCalendar = (calendar: ICalendar) => {
     setCalendars(prevCalendars =>
       prevCalendars.map(prevCalendar =>
@@ -125,6 +132,22 @@ const Calendar = () => {
     );
   };
 
+  const openNewEvent = (day: DateTime) => {
+    setEditingEvent({
+      date: getISOFromDate(day),
+      desc: '',
+      calendarId:
+        calendars.filter(calendar => calendar.selected).at(0)?.id ??
+        calendars[0].id,
+    });
+  };
+
+  const updateEvent = (event: IEvent) => {
+    setEditingEvent({
+      ...event,
+    });
+  };
+
   return (
     <Box display={'flex'} height={'100%'} alignItems={'stretch'}>
       <Box
@@ -133,14 +156,31 @@ const Calendar = () => {
         padding={'8px 16px'}
       >
         <Box component={'h2'}>Agenda React</Box>
-        <Button variant="contained" color="primary">
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => openNewEvent(getToday())}
+        >
           Novo Evento
         </Button>
         <CalendarsView {...{ calendars, toggleCalendar }} />
       </Box>
       <Box display={'flex'} flexDirection={'column'} flex={1}>
-        <CalendarHeader {...{ calendarScreen }} />
-        <CalendarTable {...{ calendarScreen }} />
+        <CalendarHeader {...{ calendarTable }} />
+        <CalendarTable
+          {...{ calendarTable }}
+          onClickDay={openNewEvent}
+          onClickEvent={updateEvent}
+        />
+        <EventFormDialog
+          event={editingEvent}
+          calendars={calendars}
+          onCancel={() => setEditingEvent(null)}
+          onSave={() => {
+            setEditingEvent(null);
+            refreshEvents();
+          }}
+        />
       </Box>
     </Box>
   );
