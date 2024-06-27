@@ -2,7 +2,7 @@ import Box from '@mui/material/Box';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import { ICalendar } from '../api/calendar';
+import { ICalendar } from '../../api/calendar';
 
 interface ICalendarsViewProps {
   calendars: ICalendar[];

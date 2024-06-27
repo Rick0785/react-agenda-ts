@@ -2,18 +2,20 @@ import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import PersonIcon from '@mui/icons-material/Person';
-import Avatar from '@mui/material/Avatar';
 import {
   getNextMonth,
   getPrevMonth,
   getYearMonthISOFromDate,
-} from '../utils/date';
+} from '../../utils/date';
 import { Link } from 'react-router-dom';
-import { ICalendarTable } from './Calendar';
+import { ICalendarTable } from '.';
+import UserMenu from './UserMenu';
+import { IUser } from '../../api/user';
 
 interface ICalendarHeaderProps {
   calendarTable: ICalendarTable;
+  onSingOut: () => void;
+  user: IUser;
 }
 
 const CalendarHeader = (props: ICalendarHeaderProps) => {
@@ -41,13 +43,10 @@ const CalendarHeader = (props: ICalendarHeaderProps) => {
         </IconButton>
       </Box>
       <Box component={'h3'} marginLeft={'16px'} flex={1}>
+        {/* <Input type="month" defaultValue={calendarTable.date} /> */}
         {calendarTable.monthFormatted}
       </Box>
-      <IconButton aria-label="Usuáro">
-        <Avatar>
-          <PersonIcon />
-        </Avatar>
-      </IconButton>
+      <UserMenu onSingOut={props.onSingOut} user={props.user} />
     </Box>
   );
 };

@@ -8,15 +8,16 @@ import {
   getMonthYearFormatted,
   getNextDay,
   getToday,
-} from '../utils/date';
+} from '../../utils/date';
 import { DateTime } from 'luxon';
-import { getEvents, IEdittingEvent, IEvent } from '../api/event';
-import { getCalendars, ICalendar } from '../api/calendar';
+import { getEvents, IEdittingEvent, IEvent } from '../../api/event';
+import { getCalendars, ICalendar } from '../../api/calendar';
 import { useParams } from 'react-router-dom';
 import CalendarsView from './CalendarsView';
 import CalendarHeader from './CalendarHeader';
 import CalendarTable from './CalendarTable';
 import EventFormDialog from './EventFormDialog';
+import { IUser } from '../../api/user';
 
 export interface ICalendarTableCell {
   dayOfWeek: string;
@@ -92,7 +93,12 @@ const generateCalendarTable = (
   return calendarScreen;
 };
 
-const Calendar = () => {
+interface ICalendarProps {
+  onSingOut: () => void;
+  user: IUser;
+}
+
+const Calendar = (props: ICalendarProps) => {
   const { month } = useParams<{ month: string }>();
   const [calendars, setCalendars] = useState<ICalendar[]>([]);
   const [events, setEvents] = useState<IEvent[]>([]);
@@ -166,7 +172,11 @@ const Calendar = () => {
         <CalendarsView {...{ calendars, toggleCalendar }} />
       </Box>
       <Box display={'flex'} flexDirection={'column'} flex={1}>
-        <CalendarHeader {...{ calendarTable }} />
+        <CalendarHeader
+          {...{ calendarTable }}
+          onSingOut={props.onSingOut}
+          user={props.user}
+        />
         <CalendarTable
           {...{ calendarTable }}
           onClickDay={openNewEvent}

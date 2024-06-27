@@ -10,8 +10,13 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Box from '@mui/material/Box';
 import { InputLabel } from '@mui/material';
-import { IEdittingEvent, postEvent, putEvent, deleteEvent } from '../api/event';
-import { ICalendar } from '../api/calendar';
+import {
+  IEdittingEvent,
+  postEvent,
+  putEvent,
+  deleteEvent,
+} from '../../api/event';
+import { ICalendar } from '../../api/calendar';
 
 interface IEventFormDialogProps {
   event: IEdittingEvent | null;
