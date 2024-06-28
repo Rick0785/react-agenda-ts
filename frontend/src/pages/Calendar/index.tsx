@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import { getISOFromDate, getToday } from '../../utils/date';
@@ -13,6 +13,7 @@ import EventFormDialog from './EventFormDialog';
 import { useMemoGenerateCalendarTable } from './_hooks';
 
 const Calendar = () => {
+  console.log('Componente Calendar foi chamado!');
   const { month } = useParams<{ month: string }>();
   const [calendars, setCalendars] = useState<ICalendar[]>([]);
   const [events, setEvents] = useState<IEvent[]>([]);
@@ -42,7 +43,7 @@ const Calendar = () => {
     }
   };
 
-  const toggleCalendar = (calendar: ICalendar) => {
+  const toggleCalendar = useCallback((calendar: ICalendar) => {
     setCalendars(prevCalendars =>
       prevCalendars.map(prevCalendar =>
         prevCalendar.id === calendar.id
@@ -50,23 +51,26 @@ const Calendar = () => {
           : prevCalendar
       )
     );
-  };
+  }, []);
 
-  const openNewEvent = (day: DateTime) => {
-    setEditingEvent({
-      date: getISOFromDate(day),
-      desc: '',
-      calendarId:
-        calendars.filter(calendar => calendar.selected).at(0)?.id ??
-        calendars[0].id,
-    });
-  };
+  const openNewEvent = useCallback(
+    (day: DateTime) => {
+      setEditingEvent({
+        date: getISOFromDate(day),
+        desc: '',
+        calendarId:
+          calendars.filter(calendar => calendar.selected).at(0)?.id ??
+          calendars[0].id,
+      });
+    },
+    [calendars]
+  );
 
-  const updateEvent = (event: IEvent) => {
+  const updateEvent = useCallback((event: IEvent) => {
     setEditingEvent({
       ...event,
     });
-  };
+  }, []);
 
   return (
     <Box display={'flex'} height={'100%'} alignItems={'stretch'}>

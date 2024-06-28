@@ -1,3 +1,4 @@
+import React from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -60,6 +61,7 @@ interface ICalendarScreenProps {
 }
 
 const CalendarTable = (props: ICalendarScreenProps) => {
+  console.log('Componente CalendarTable foi chamado!');
   const { calendarTable, onClickDay, onClickEvent } = props;
 
   const handleClickDay = (mouseEvent: React.MouseEvent, day: DateTime) => {
@@ -154,4 +156,4 @@ const CalendarTable = (props: ICalendarScreenProps) => {
   );
 };
 
-export default CalendarTable;
+export default React.memo(CalendarTable);

@@ -1,3 +1,4 @@
+import React from 'react';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -16,6 +17,7 @@ interface ICalendarHeaderProps {
 }
 
 const CalendarHeader = (props: ICalendarHeaderProps) => {
+  console.log('Componente CalendarHeader foi chamado!');
   const { calendarTable } = props;
   return (
     <Box display={'flex'} alignItems={'center'} padding="8px 16px">
@@ -47,4 +49,5 @@ const CalendarHeader = (props: ICalendarHeaderProps) => {
     </Box>
   );
 };
-export default CalendarHeader;
+
+export default React.memo(CalendarHeader);

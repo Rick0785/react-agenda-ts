@@ -26,6 +26,7 @@ interface IEventFormDialogProps {
 }
 
 const EventFormDialog = (props: IEventFormDialogProps) => {
+  console.log('Componente EventFormDialog foi chamado!');
   const { event, calendars, onCancel, onSave } = props;
   const [edittingEvent, setEdittingEvent] = useState<IEdittingEvent | null>(
     event

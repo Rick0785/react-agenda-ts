@@ -13,6 +13,7 @@ import { postSingOut } from '../../api/user';
 import { useAuthContext } from '../../contexts/AuthContext';
 
 export default function UserMenu() {
+  console.log('Componente UserMenu foi chamado!');
   const { user, onSingOut } = useAuthContext();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);

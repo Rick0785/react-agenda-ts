@@ -1,3 +1,4 @@
+import React from 'react';
 import Box from '@mui/material/Box';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -10,6 +11,7 @@ interface ICalendarsViewProps {
 }
 
 const CalendarsView = (props: ICalendarsViewProps) => {
+  console.log('Componente CalendarsView foi chamado!');
   const { calendars, toggleCalendar } = props;
   return (
     <Box marginTop={'64px'}>
@@ -33,4 +35,4 @@ const CalendarsView = (props: ICalendarsViewProps) => {
   );
 };
 
-export default CalendarsView;
+export default React.memo(CalendarsView);
