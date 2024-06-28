@@ -6,10 +6,10 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Box from '@mui/material/Box';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
-import { ICalendarTable } from '.';
 import { DAYS_OF_WEEK, getToday } from '../../utils/date';
 import { DateTime } from 'luxon';
 import { IEvent } from '../../api/event';
+import { ICalendarTable } from './_hooks/useMemoGenerateCalendarTable';
 
 const styles = {
   table: {

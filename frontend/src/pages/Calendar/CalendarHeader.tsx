@@ -8,7 +8,7 @@ import {
   getYearMonthISOFromDate,
 } from '../../utils/date';
 import { Link } from 'react-router-dom';
-import { ICalendarTable } from '.';
+import { ICalendarTable } from './_hooks/useMemoGenerateCalendarTable';
 import UserMenu from './UserMenu';
 
 interface ICalendarHeaderProps {
