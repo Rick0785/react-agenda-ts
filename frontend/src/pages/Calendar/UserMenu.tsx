@@ -9,15 +9,11 @@ import IconButton from '@mui/material/IconButton';
 import PersonIcon from '@mui/icons-material/Person';
 import Tooltip from '@mui/material/Tooltip';
 import Logout from '@mui/icons-material/Logout';
-import { IUser, postSingOut } from '../../api/user';
+import { postSingOut } from '../../api/user';
+import { useAuthContext } from '../../contexts/AuthContext';
 
-interface IUserMenuProps {
-  onSingOut: () => void;
-  user: IUser;
-}
-
-export default function UserMenu(props: IUserMenuProps) {
-  const { user, onSingOut } = props;
+export default function UserMenu() {
+  const { user, onSingOut } = useAuthContext();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 

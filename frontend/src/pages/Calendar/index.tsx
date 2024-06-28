@@ -17,7 +17,6 @@ import CalendarsView from './CalendarsView';
 import CalendarHeader from './CalendarHeader';
 import CalendarTable from './CalendarTable';
 import EventFormDialog from './EventFormDialog';
-import { IUser } from '../../api/user';
 
 export interface ICalendarTableCell {
   dayOfWeek: string;
@@ -93,12 +92,7 @@ const generateCalendarTable = (
   return calendarScreen;
 };
 
-interface ICalendarProps {
-  onSingOut: () => void;
-  user: IUser;
-}
-
-const Calendar = (props: ICalendarProps) => {
+const Calendar = () => {
   const { month } = useParams<{ month: string }>();
   const [calendars, setCalendars] = useState<ICalendar[]>([]);
   const [events, setEvents] = useState<IEvent[]>([]);
@@ -172,11 +166,7 @@ const Calendar = (props: ICalendarProps) => {
         <CalendarsView {...{ calendars, toggleCalendar }} />
       </Box>
       <Box display={'flex'} flexDirection={'column'} flex={1}>
-        <CalendarHeader
-          {...{ calendarTable }}
-          onSingOut={props.onSingOut}
-          user={props.user}
-        />
+        <CalendarHeader {...{ calendarTable }} />
         <CalendarTable
           {...{ calendarTable }}
           onClickDay={openNewEvent}

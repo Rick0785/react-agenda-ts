@@ -7,7 +7,7 @@ import TableRow from '@mui/material/TableRow';
 import Box from '@mui/material/Box';
 import WatchLaterIcon from '@mui/icons-material/WatchLater';
 import { ICalendarTable } from '.';
-import { DAYS_OF_WEEK } from '../../utils/date';
+import { DAYS_OF_WEEK, getToday } from '../../utils/date';
 import { DateTime } from 'luxon';
 import { IEvent } from '../../api/event';
 
@@ -26,9 +26,14 @@ const styles = {
       padding: '8px 4px',
     },
   },
-  dayOfWeek: {
+  dayOfMonth: {
+    display: 'inline-block',
     fontWeight: 500,
+    width: '26px',
+    padding: '2px',
+    lineHeigth: '24px',
     marginBottom: '4px',
+    borderRadius: '50%',
   },
   event: {
     display: 'flex',
@@ -89,7 +94,19 @@ const CalendarTable = (props: ICalendarScreenProps) => {
                     key={day.date.toString()}
                     onClick={mouseEvent => handleClickDay(mouseEvent, day.date)}
                   >
-                    <Box sx={styles.dayOfWeek}>{day.date.day}</Box>
+                    <Box
+                      style={
+                        day.date.hasSame(getToday(), 'day')
+                          ? {
+                              backgroundColor: '#1976d2',
+                              color: 'white',
+                            }
+                          : {}
+                      }
+                      sx={styles.dayOfMonth}
+                    >
+                      {day.date.day}
+                    </Box>
                     {day.events?.map(event => {
                       const color = event.calendar?.color;
                       return (

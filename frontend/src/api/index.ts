@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080', //process.env.REACT_CALENDAR_API,
+  baseURL: process.env.REACT_APP_CALENDAR_API,
   withCredentials: true,
   headers: {
     Accept: 'application/jsoncamelcase',

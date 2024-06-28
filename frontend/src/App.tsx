@@ -5,6 +5,7 @@ import {
   RouterProvider,
 } from 'react-router-dom';
 import { getUser, IUser } from './api/user';
+import { AuthContext } from './contexts/AuthContext';
 import Calendar from './pages/Calendar';
 import Login from './pages/Login';
 import { getYearMonthISO } from './utils/date';
@@ -16,14 +17,14 @@ function App() {
     getUser().then(setUser, () => setUser(null));
   }, []);
 
-  const singOut = () => {
+  const onSingOut = () => {
     setUser(null);
   };
 
   const router = createBrowserRouter([
     {
       path: '/calendar/:month',
-      element: <Calendar user={user!} onSingOut={singOut} />,
+      element: <Calendar />,
     },
     {
       path: '*',
@@ -32,7 +33,9 @@ function App() {
   ]);
 
   return user ? (
-    <RouterProvider router={router} />
+    <AuthContext.Provider value={{ user, onSingOut }}>
+      <RouterProvider router={router} />
+    </AuthContext.Provider>
   ) : (
     <Login onSignIn={setUser} />
   );

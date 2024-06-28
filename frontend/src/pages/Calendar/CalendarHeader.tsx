@@ -10,12 +10,9 @@ import {
 import { Link } from 'react-router-dom';
 import { ICalendarTable } from '.';
 import UserMenu from './UserMenu';
-import { IUser } from '../../api/user';
 
 interface ICalendarHeaderProps {
   calendarTable: ICalendarTable;
-  onSingOut: () => void;
-  user: IUser;
 }
 
 const CalendarHeader = (props: ICalendarHeaderProps) => {
@@ -46,7 +43,7 @@ const CalendarHeader = (props: ICalendarHeaderProps) => {
         {/* <Input type="month" defaultValue={calendarTable.date} /> */}
         {calendarTable.monthFormatted}
       </Box>
-      <UserMenu onSingOut={props.onSingOut} user={props.user} />
+      <UserMenu />
     </Box>
   );
 };
