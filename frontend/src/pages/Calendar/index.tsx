@@ -1,23 +1,24 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import { getISOFromDate, getToday } from '../../utils/date';
-import { DateTime } from 'luxon';
-import { getEvents, IEdittingEvent, IEvent } from '../../api/event';
-import { getCalendars, ICalendar } from '../../api/calendar';
+import { getToday } from '../../utils/date';
+import { getEvents } from '../../api/event';
+import { getCalendars } from '../../api/calendar';
 import { useParams } from 'react-router-dom';
 import CalendarsView from './CalendarsView';
 import CalendarHeader from './CalendarHeader';
 import CalendarTable from './CalendarTable';
 import EventFormDialog from './EventFormDialog';
-import { useMemoGenerateCalendarTable } from './_hooks';
+import {
+  useMemoGenerateCalendarTable,
+  useReducerCalendarState,
+} from './_hooks';
 
 const Calendar = () => {
   console.log('Componente Calendar foi chamado!');
   const { month } = useParams<{ month: string }>();
-  const [calendars, setCalendars] = useState<ICalendar[]>([]);
-  const [events, setEvents] = useState<IEvent[]>([]);
-  const [editingEvent, setEditingEvent] = useState<IEdittingEvent | null>(null);
+  const [state, dispatch] = useReducerCalendarState();
+  const { calendars, events, editingEvent } = state;
   const calendarTable = useMemoGenerateCalendarTable(month, calendars, events);
   const firstDate = calendarTable.firstDate.startOf('day').toISO();
   const lastDate = calendarTable.lastDate.startOf('day').toISO();
@@ -26,51 +27,23 @@ const Calendar = () => {
     if (firstDate && lastDate) {
       Promise.all([getCalendars(), getEvents(firstDate, lastDate)]).then(
         ([calendars, events]) => {
-          setCalendars(
-            calendars.map(calendar => {
-              return { ...calendar, selected: true };
-            })
-          );
-          setEvents(events);
+          dispatch({ type: 'load', payload: { calendars, events } });
         }
       );
     }
-  }, [firstDate, lastDate]);
+  }, [dispatch, firstDate, lastDate]);
 
   const refreshEvents = () => {
     if (firstDate && lastDate) {
-      getEvents(firstDate, lastDate).then(setEvents);
+      getEvents(firstDate, lastDate).then(events =>
+        dispatch({ type: 'refreshEvents', payload: events })
+      );
     }
   };
 
-  const toggleCalendar = useCallback((calendar: ICalendar) => {
-    setCalendars(prevCalendars =>
-      prevCalendars.map(prevCalendar =>
-        prevCalendar.id === calendar.id
-          ? { ...prevCalendar, selected: !prevCalendar.selected }
-          : prevCalendar
-      )
-    );
-  }, []);
-
-  const openNewEvent = useCallback(
-    (day: DateTime) => {
-      setEditingEvent({
-        date: getISOFromDate(day),
-        desc: '',
-        calendarId:
-          calendars.filter(calendar => calendar.selected).at(0)?.id ??
-          calendars[0].id,
-      });
-    },
-    [calendars]
-  );
-
-  const updateEvent = useCallback((event: IEvent) => {
-    setEditingEvent({
-      ...event,
-    });
-  }, []);
+  const closeDialog = useCallback(() => {
+    dispatch({ type: 'closeDialog' });
+  }, [dispatch]);
 
   return (
     <Box display={'flex'} height={'100%'} alignItems={'stretch'}>
@@ -83,25 +56,21 @@ const Calendar = () => {
         <Button
           variant="contained"
           color="primary"
-          onClick={() => openNewEvent(getToday())}
+          onClick={() => dispatch({ type: 'newEvent', payload: getToday() })}
         >
           Novo Evento
         </Button>
-        <CalendarsView {...{ calendars, toggleCalendar }} />
+        <CalendarsView {...{ calendars, dispatch }} />
       </Box>
       <Box display={'flex'} flexDirection={'column'} flex={1}>
         <CalendarHeader {...{ calendarTable }} />
-        <CalendarTable
-          {...{ calendarTable }}
-          onClickDay={openNewEvent}
-          onClickEvent={updateEvent}
-        />
+        <CalendarTable {...{ calendarTable, dispatch }} />
         <EventFormDialog
           event={editingEvent}
           calendars={calendars}
-          onCancel={() => setEditingEvent(null)}
+          onCancel={closeDialog}
           onSave={() => {
-            setEditingEvent(null);
+            closeDialog();
             refreshEvents();
           }}
         />

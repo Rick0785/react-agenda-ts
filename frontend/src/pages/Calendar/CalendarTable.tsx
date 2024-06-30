@@ -11,6 +11,7 @@ import { DAYS_OF_WEEK, getToday } from '../../utils/date';
 import { DateTime } from 'luxon';
 import { IEvent } from '../../api/event';
 import { ICalendarTable } from './_hooks/useMemoGenerateCalendarTable';
+import { CalendarAction } from './_hooks/useReducerCalendarState';
 
 const styles = {
   table: {
@@ -56,31 +57,30 @@ const styles = {
 
 interface ICalendarScreenProps {
   calendarTable: ICalendarTable;
-  onClickDay: (day: DateTime) => void;
-  onClickEvent: (event: IEvent) => void;
+  dispatch: React.Dispatch<CalendarAction>;
 }
 
 const CalendarTable = (props: ICalendarScreenProps) => {
   console.log('Componente CalendarTable foi chamado!');
-  const { calendarTable, onClickDay, onClickEvent } = props;
+  const { calendarTable, dispatch } = props;
 
   const handleClickDay = (mouseEvent: React.MouseEvent, day: DateTime) => {
     if (mouseEvent.target === mouseEvent.currentTarget) {
-      onClickDay(day);
+      dispatch({ type: 'newEvent', payload: day });
     }
   };
 
   const handleClickEvent = (event: IEvent) => {
-    onClickEvent(event);
+    dispatch({ type: 'editEvent', payload: event });
   };
 
   return (
     <TableContainer component={Box} flex={1}>
-      <Table sx={styles.table} aria-label="simple table">
+      <Table sx={styles.table} aria-label="calendário">
         <TableHead>
           <TableRow>
             {DAYS_OF_WEEK.map(day => (
-              <TableCell align="center" key={day}>
+              <TableCell sx={{ fontWeight: 'bold' }} align="center" key={day}>
                 {day}
               </TableCell>
             ))}

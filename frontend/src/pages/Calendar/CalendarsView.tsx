@@ -4,15 +4,16 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import { ICalendar } from '../../api/calendar';
+import { CalendarAction } from './_hooks/useReducerCalendarState';
 
 interface ICalendarsViewProps {
   calendars: ICalendar[];
-  toggleCalendar: (calendar: ICalendar) => void;
+  dispatch: React.Dispatch<CalendarAction>;
 }
 
 const CalendarsView = (props: ICalendarsViewProps) => {
   console.log('Componente CalendarsView foi chamado!');
-  const { calendars, toggleCalendar } = props;
+  const { calendars, dispatch } = props;
   return (
     <Box marginTop={'64px'}>
       <Box component={'h3'}>Agendas</Box>
@@ -24,7 +25,9 @@ const CalendarsView = (props: ICalendarsViewProps) => {
               <Checkbox
                 style={{ color: calendar.color }}
                 checked={calendar.selected}
-                onChange={() => toggleCalendar(calendar)}
+                onChange={() =>
+                  dispatch({ type: 'toggleCalendar', payload: calendar })
+                }
               />
             }
             label={calendar.name}
