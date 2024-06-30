@@ -1,45 +1,18 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import { getToday } from '../../utils/date';
-import { getEvents } from '../../api/event';
-import { getCalendars } from '../../api/calendar';
 import { useParams } from 'react-router-dom';
 import CalendarsView from './CalendarsView';
 import CalendarHeader from './CalendarHeader';
 import CalendarTable from './CalendarTable';
 import EventFormDialog from './EventFormDialog';
-import {
-  useMemoGenerateCalendarTable,
-  useReducerCalendarState,
-} from './_hooks';
+import { useCalendarState } from './_hooks';
 
 const Calendar = () => {
-  console.log('Componente Calendar foi chamado!');
   const { month } = useParams<{ month: string }>();
-  const [state, dispatch] = useReducerCalendarState();
-  const { calendars, events, editingEvent } = state;
-  const calendarTable = useMemoGenerateCalendarTable(month, calendars, events);
-  const firstDate = calendarTable.firstDate.startOf('day').toISO();
-  const lastDate = calendarTable.lastDate.startOf('day').toISO();
-
-  React.useEffect(() => {
-    if (firstDate && lastDate) {
-      Promise.all([getCalendars(), getEvents(firstDate, lastDate)]).then(
-        ([calendars, events]) => {
-          dispatch({ type: 'load', payload: { calendars, events } });
-        }
-      );
-    }
-  }, [dispatch, firstDate, lastDate]);
-
-  const refreshEvents = () => {
-    if (firstDate && lastDate) {
-      getEvents(firstDate, lastDate).then(events =>
-        dispatch({ type: 'refreshEvents', payload: events })
-      );
-    }
-  };
+  const { calendars, calendarTable, dispatch, refreshEvents, editingEvent } =
+    useCalendarState(month);
 
   const closeDialog = useCallback(() => {
     dispatch({ type: 'closeDialog' });
