@@ -5,6 +5,8 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CssBaseline } from '@mui/material';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,7 +29,9 @@ root.render(
   <React.StrictMode>
     <CssBaseline />
     <QueryClientProvider client={queryClient}>
-      <App />
+      <LocalizationProvider dateAdapter={AdapterLuxon} adapterLocale={'pt-BR'}>
+        <App />
+      </LocalizationProvider>
     </QueryClientProvider>
   </React.StrictMode>
 );

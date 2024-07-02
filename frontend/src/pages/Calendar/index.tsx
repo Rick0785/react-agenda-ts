@@ -36,7 +36,7 @@ const Calendar = () => {
         <CalendarsView {...{ calendars, dispatch }} />
       </Box>
       <Box display={'flex'} flexDirection={'column'} flex={1}>
-        <CalendarHeader {...{ calendarTable }} />
+        <CalendarHeader date={calendarTable.date} />
         <CalendarTable {...{ calendarTable, dispatch }} />
         <EventFormDialog
           event={editingEvent}
