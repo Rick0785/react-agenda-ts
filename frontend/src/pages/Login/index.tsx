@@ -5,14 +5,14 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
-import { ILogin, IUser, postSingIn } from '../../api/user';
+import { ILogin, postSingIn } from '../../api/user';
+import { useAuthContext } from '../../hooks/useAuth';
+import { useNavigation } from 'react-router-dom';
+import { LinearProgress } from '@mui/material';
 
-interface ILoginProps {
-  onSignIn: (user: IUser) => void;
-}
-
-const Login = (props: ILoginProps) => {
-  const { onSignIn } = props;
+const Login = () => {
+  const navigation = useNavigation();
+  const { login: onSignIn } = useAuthContext();
   const [login, setLogin] = useState<ILogin>({
     email: 'admin@email.com',
     password: '',
@@ -25,6 +25,8 @@ const Login = (props: ILoginProps) => {
       setError('Email não encontrado ou senha incorreta');
     });
   };
+
+  const isloading = navigation.state === 'loading';
 
   return (
     <Container maxWidth="sm" component="form" onSubmit={signIn}>
@@ -65,8 +67,18 @@ const Login = (props: ILoginProps) => {
           <Alert severity="info">{error}</Alert>
         </Stack>
       )}
+      {isloading && (
+        <Box sx={{ width: '100%' }}>
+          <LinearProgress />
+        </Box>
+      )}
       <Box textAlign="right" marginTop="16px">
-        <Button variant="contained" color="primary" type="submit">
+        <Button
+          disabled={isloading}
+          variant="contained"
+          color="primary"
+          type="submit"
+        >
           Entrar
         </Button>
       </Box>

@@ -35,7 +35,6 @@ const generateCalendarTable = (
   calendars: ICalendar[] | undefined,
   events: IEvent[] | undefined
 ): ICalendarTable => {
-  console.log('Função generateCalendarTable foi chamada!');
   const date = month ? getFromYearMonthISO(month) : getToday();
   const firstDayOfMonth = date.startOf('month');
   const firstDayOfCalendar = firstDayOfMonth.startOf('week', {

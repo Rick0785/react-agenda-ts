@@ -1,44 +1,40 @@
-import { useEffect, useState } from 'react';
 import {
   createBrowserRouter,
+  createRoutesFromElements,
   Navigate,
+  Route,
   RouterProvider,
+  useOutlet,
 } from 'react-router-dom';
-import { getUser, IUser } from './api/user';
-import { AuthContext } from './contexts/AuthContext';
+import { AuthProvider } from './hooks/useAuth';
 import Calendar from './pages/Calendar';
 import Login from './pages/Login';
 import { getYearMonthISO } from './utils/date';
+import { loader as protectedLoader } from './routes/protected/actions';
+import ProtectedRoute from './routes/protected';
+
+const AuthLayout = () => {
+  const outlet = useOutlet();
+  return <AuthProvider>{outlet}</AuthProvider>;
+};
+
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route element={<AuthLayout />}>
+      <Route path="/login" element={<Login />} />
+      <Route loader={protectedLoader} element={<ProtectedRoute />}>
+        <Route path="/calendar/:month" element={<Calendar />} />
+        <Route
+          path="*"
+          element={<Navigate to={`/calendar/${getYearMonthISO()}`} />}
+        />
+      </Route>
+    </Route>
+  )
+);
 
 function App() {
-  const [user, setUser] = useState<IUser | null>(null);
-
-  useEffect(() => {
-    getUser().then(setUser, () => setUser(null));
-  }, []);
-
-  const onSingOut = () => {
-    setUser(null);
-  };
-
-  const router = createBrowserRouter([
-    {
-      path: '/calendar/:month',
-      element: <Calendar />,
-    },
-    {
-      path: '*',
-      element: <Navigate to={`/calendar/${getYearMonthISO()}`} />,
-    },
-  ]);
-
-  return user ? (
-    <AuthContext.Provider value={{ user, onSingOut }}>
-      <RouterProvider router={router} />
-    </AuthContext.Provider>
-  ) : (
-    <Login onSignIn={setUser} />
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;

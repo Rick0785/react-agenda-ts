@@ -61,7 +61,6 @@ interface ICalendarScreenProps {
 }
 
 const CalendarTable = (props: ICalendarScreenProps) => {
-  console.log('Componente CalendarTable foi chamado!');
   const { calendarTable, dispatch } = props;
 
   const handleClickDay = (mouseEvent: React.MouseEvent, day: DateTime) => {

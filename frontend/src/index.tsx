@@ -30,7 +30,7 @@ root.render(
     <CssBaseline />
     <QueryClientProvider client={queryClient}>
       <LocalizationProvider dateAdapter={AdapterLuxon} adapterLocale={'pt-BR'}>
-        <App />
+          <App />
       </LocalizationProvider>
     </QueryClientProvider>
   </React.StrictMode>

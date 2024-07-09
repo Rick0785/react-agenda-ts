@@ -10,11 +10,10 @@ import PersonIcon from '@mui/icons-material/Person';
 import Tooltip from '@mui/material/Tooltip';
 import Logout from '@mui/icons-material/Logout';
 import { postSingOut } from '../../api/user';
-import { useAuthContext } from '../../contexts/AuthContext';
+import { useAuthContext } from '../../hooks/useAuth';
 
 export default function UserMenu() {
-  console.log('Componente UserMenu foi chamado!');
-  const { user, onSingOut } = useAuthContext();
+  const { user, logout: onSingOut } = useAuthContext();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -86,8 +85,8 @@ export default function UserMenu() {
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
         <Box padding="16px" textAlign="center">
-          <Box>{user.name}</Box>
-          <Box component="small">{user.email}</Box>
+          <Box>{user?.name}</Box>
+          <Box component="small">{user?.email}</Box>
         </Box>
         <Divider />
         <MenuItem onClick={singOut}>

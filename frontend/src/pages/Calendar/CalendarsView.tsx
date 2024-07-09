@@ -12,7 +12,6 @@ interface ICalendarsViewProps {
 }
 
 const CalendarsView = (props: ICalendarsViewProps) => {
-  console.log('Componente CalendarsView foi chamado!');
   const { calendars, dispatch } = props;
   return (
     <Box marginTop={'64px'}>
