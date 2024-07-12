@@ -2,12 +2,13 @@ import {
   createContext,
   useContext,
   useMemo,
-  useState,
   useCallback,
   ReactNode,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IUser } from '../api/user';
+import { Storages } from '../constantes';
+import { useLocalStorage } from './useLocalStorage';
 
 export interface IAuthContext {
   user: IUser | null;
@@ -26,7 +27,7 @@ export interface IAuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: IAuthProviderProps) => {
-  const [user, setUser] = useState<IUser | null>(null);
+  const [user, setUser] = useLocalStorage<IUser | null>(Storages.USER, null);
   const navigate = useNavigate();
 
   const login = useCallback(
@@ -34,13 +35,13 @@ export const AuthProvider = ({ children }: IAuthProviderProps) => {
       setUser(data);
       navigate('/');
     },
-    [navigate]
+    [navigate, setUser]
   );
 
   const logout = useCallback(() => {
     setUser(null);
     navigate('/login', { replace: true });
-  }, [navigate]);
+  }, [navigate, setUser]);
 
   const value = useMemo<IAuthContext>(
     () => ({

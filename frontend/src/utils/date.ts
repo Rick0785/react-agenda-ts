@@ -40,6 +40,19 @@ export const getMonthYearFormatted = (date: DateTime): string => {
   );
 };
 
+export const getDateFormatted = (date: DateTime): string => {
+  return upperFirstLetter(
+    date.toLocaleString({ day: '2-digit', month: 'long', year: 'numeric' })
+  );
+};
+
+export const getTodayFormatted = (): string => {
+  const date = getToday();
+  return upperFirstLetter(
+    date.toLocaleString({ day: '2-digit', month: 'long', year: 'numeric' })
+  );
+};
+
 export const getNextMonth = (date: DateTime): DateTime => {
   return date.plus({ months: 1 });
 };

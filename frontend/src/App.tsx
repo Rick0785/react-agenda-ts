@@ -1,5 +1,5 @@
 import {
-  createBrowserRouter,
+  createHashRouter,
   createRoutesFromElements,
   Navigate,
   Route,
@@ -18,7 +18,7 @@ const AuthLayout = () => {
   return <AuthProvider>{outlet}</AuthProvider>;
 };
 
-const router = createBrowserRouter(
+const router = createHashRouter(
   createRoutesFromElements(
     <Route element={<AuthLayout />}>
       <Route path="/login" element={<Login />} />

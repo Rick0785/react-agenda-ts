@@ -1,17 +1,23 @@
 import React from 'react';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import InsertInvitationOutlinedIcon from '@mui/icons-material/InsertInvitationOutlined';
 import {
+  getMonthYearFormatted,
   getNextMonth,
   getPrevMonth,
+  getToday,
+  getTodayFormatted,
   getYearMonthISOFromDate,
 } from '../../utils/date';
 import { Link, useNavigate } from 'react-router-dom';
 import UserMenu from './UserMenu';
 import { DateTime } from 'luxon';
 import DateCalendarMenu from './DateCalendarMenu';
+import { Tooltip } from '@mui/material';
 
 interface ICalendarHeaderProps {
   date: DateTime;
@@ -30,20 +36,45 @@ const CalendarHeader = (props: ICalendarHeaderProps) => {
   return (
     <Box display={'flex'} alignItems={'center'} padding="8px 16px">
       <Box>
-        <IconButton
-          aria-label="Mês Anterior"
-          component={Link}
-          to={`/calendar/${getYearMonthISOFromDate(getPrevMonth(date))}`}
+        <Tooltip title={`Ir para hoje: ${getTodayFormatted()}`}>
+          <Button
+            variant="outlined"
+            color="inherit"
+            startIcon={<InsertInvitationOutlinedIcon />}
+            onClick={mouseEvent => {
+              mouseEvent.preventDefault();
+              onMonthChange(getToday());
+            }}
+          >
+            Hoje
+          </Button>
+        </Tooltip>
+        <Tooltip
+          title={`Ir para hoje mês anterior: ${getMonthYearFormatted(
+            getPrevMonth(date)
+          )}`}
         >
-          <ChevronLeftIcon />
-        </IconButton>
-        <IconButton
-          aria-label="Próximo mês"
-          component={Link}
-          to={`/calendar/${getYearMonthISOFromDate(getNextMonth(date))}`}
+          <IconButton
+            aria-label="Mês Anterior"
+            component={Link}
+            to={`/calendar/${getYearMonthISOFromDate(getPrevMonth(date))}`}
+          >
+            <ChevronLeftIcon />
+          </IconButton>
+        </Tooltip>
+        <Tooltip
+          title={`Ir para hoje mês seguinte: ${getMonthYearFormatted(
+            getNextMonth(date)
+          )}`}
         >
-          <ChevronRightIcon />
-        </IconButton>
+          <IconButton
+            aria-label="Próximo mês"
+            component={Link}
+            to={`/calendar/${getYearMonthISOFromDate(getNextMonth(date))}`}
+          >
+            <ChevronRightIcon />
+          </IconButton>
+        </Tooltip>
       </Box>
       <Box
         component={'h3'}

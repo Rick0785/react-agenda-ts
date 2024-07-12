@@ -4,6 +4,7 @@ import { useQuery, UseQueryResult } from '@tanstack/react-query';
 export interface IUser {
   name: string;
   email: string;
+  token?: string;
 }
 
 export interface ILogin {

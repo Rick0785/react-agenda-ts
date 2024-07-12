@@ -3,35 +3,48 @@ const hasAuth = process.argv[2] !== 'noauth';
 const fs = require('fs');
 const bodyParser = require('body-parser');
 const jsonServer = require('json-server');
-const session = require('express-session');
+const jwt = require('jsonwebtoken');
+const cors = require('cors');
+require('dotenv').config();
 
 const server = jsonServer.create();
 
 const dbFilePath = './db.json';
 const userdb = JSON.parse(fs.readFileSync('./users.json', 'UTF-8'));
 
-const SECRET_KEY = '123456789';
+const SECRET_KEY = process.env.SECRET_KEY;
+const TOKEN_EXPIRATION = process.env.TOKEN_EXPIRATION;
+const REACT_APP_FRONTEND_ORIGIN = process.env.REACT_APP_FRONTEND_ORIGIN;
 
 server.use(jsonServer.defaults());
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(bodyParser.json());
+server.use(
+  cors({
+    origin: process.env.REACT_APP_FRONTEND_ORIGIN,
+    credentials: true,
+  })
+);
 
 server.get('/calendar/:month', function (req, res) {
   res.sendFile(__dirname + '/public/index.html');
 });
 
-server.use(
-  session({
-    secret: SECRET_KEY,
-    resave: false,
-    saveUninitialized: false,
-  })
-);
-
 function findUser({ email, password }) {
   return userdb.users.find(
     user => user.email === email && user.password === password
   );
+}
+
+function verifyToken(req, res, next) {
+  const bearerHeader = req.headers['authorization'];
+  if (typeof bearerHeader !== 'undefined') {
+    const bearerToken = bearerHeader.split(' ')[1];
+    req.token = bearerToken;
+    next();
+  } else {
+    res.sendStatus(403);
+  }
 }
 
 server.post('/auth/login', (req, res) => {
@@ -42,38 +55,52 @@ server.post('/auth/login', (req, res) => {
     const message = 'Incorrect email or password';
     res.status(status).json({ status, message });
   } else {
-    req.session.user = { name: user.name, email: user.email };
-    res.status(200).json(req.session.user);
+    jwt.sign(
+      { email: user.email },
+      SECRET_KEY,
+      { expiresIn: TOKEN_EXPIRATION },
+      (err, token) => {
+        if (err) {
+          res.sendStatus(500);
+        } else {
+          res.status(200).json({ email: user.email, name: user.name, token });
+        }
+      }
+    );
   }
 });
 
-server.get('/auth/user', (req, res) => {
-  if (req.session.user) {
-    res.status(200).json(req.session.user);
-  } else {
-    res.status(401).json({ status: 401, message: 'Not authenticated' });
-  }
+server.get('/auth/user', verifyToken, (req, res) => {
+  jwt.verify(req.token, SECRET_KEY, (err, decoded) => {
+    if (err) {
+      res.status(401).json({ status: 401, message: 'Not authenticated' });
+    } else {
+      const user = userdb.users.find(user => user.email === decoded.email);
+      res.status(200).json({ email: user.email, name: user.name });
+    }
+  });
 });
 
-server.post('/auth/logout', (req, res) => {
-  if (req.session.user) {
-    req.session.destroy(function (err) {
+server.post('/auth/logout', verifyToken, (req, res) => {
+  jwt.verify(req.token, SECRET_KEY, (err, decoded) => {
+    if (err) {
+      res.status(401).json({ status: 401, message: 'Not authenticated' });
+    } else {
       res.status(200).json({ message: 'Signed out' });
-    });
-  } else {
-    res.status(401).json({ status: 401, message: 'Not authenticated' });
-  }
+    }
+  });
 });
 
 if (hasAuth) {
-  server.use(/^(?!\/auth).*$/, (req, res, next) => {
-    if (!req.session.user) {
-      const status = 401;
-      res.status(status).json({ status, message: 'Not authenticated' });
-      return;
-    } else {
-      next();
-    }
+  server.use(/^(?!\/auth).*$/, verifyToken, (req, res, next) => {
+    jwt.verify(req.token, SECRET_KEY, err => {
+      if (err) {
+        const status = 401;
+        res.status(status).json({ status, message: 'Not authenticated' });
+      } else {
+        next();
+      }
+    });
   });
 }
 
@@ -100,7 +127,7 @@ server.use((req, res, next) => {
     db.events.push({
       id: db.events.length + 1,
       date: newDate,
-      time: '14:00',
+      time: '13:00',
       desc: 'Reunião com a equipe Dev',
       calendarId: 2,
     });
